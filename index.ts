@@ -5,7 +5,8 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv";
 dotenv.config();
 
-import { userRouter } from "./src/Routes/index.js";
+import { authenticateDatabaseConnection } from "./src/db/index.js";
+import { userRouter } from "./src/routes/index.js";
 
 const expressApplicationInstance = express();
 const applicationPortNumber = process.env.APPLICATION_PORT_NUMBER || 3000;
@@ -23,11 +24,16 @@ expressApplicationInstance.use(bodyParser.json());
 expressApplicationInstance.use(bodyParser.urlencoded({ extended: true }));
 expressApplicationInstance.use("/api", userRouter);
 
-const startExpressApplicationServer = (
+const startExpressApplicationServer = async (
   portNumber: number | string,
   callback: () => void
 ) => {
-  expressApplicationInstance.listen(portNumber, callback);
+  try {
+    await authenticateDatabaseConnection();
+    expressApplicationInstance.listen(portNumber, callback);
+  } catch (error) {
+    console.error(`Something went wrong!, Please see error : ${error}`);
+  }
 };
 
 startExpressApplicationServer(
