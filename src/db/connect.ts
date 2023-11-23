@@ -1,6 +1,9 @@
 import { Sequelize } from "sequelize";
 
 export const sequelizeInstance = new Sequelize({
+  define: {
+    timestamps: false,
+  },
   dialect: "sqlite",
   storage: "path/to/database.sqlite",
 });
