@@ -1,10 +1,11 @@
-import { RequestHandler, Router } from "express";
+import { Router } from "express";
+import {
+  createUserController,
+  getAllUsersController,
+} from "../controllers/index.js";
+
 const router = Router();
 
-const exampleRouterHandler: RequestHandler = (request, response) => {
-  response.send("connected");
-};
-
-router.route("/users").post(exampleRouterHandler).get(exampleRouterHandler);
+router.route("/users").post(createUserController).get(getAllUsersController);
 
 export default router;
