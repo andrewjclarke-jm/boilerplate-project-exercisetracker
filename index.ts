@@ -1,12 +1,23 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
+import xss from "xss-clean";
+import helmet from "helmet";
 import bodyParser from "body-parser";
 
 import dotenv from "dotenv";
 dotenv.config();
 
 import { authenticateDatabaseConnection } from "./src/db/index.js";
-import { userRouter } from "./src/routes/index.js";
+import {
+  exerciseLogRouter,
+  exerciseRouter,
+  userRouter,
+} from "./src/routes/index.js";
+
+import {
+  errorHandlerMiddleware,
+  routeNotFoundMiddleware,
+} from "./src/middlewares/index.js";
 
 const expressApplicationInstance = express();
 const applicationPortNumber = process.env.APPLICATION_PORT_NUMBER || 3000;
@@ -15,14 +26,25 @@ const applicationStartCallbackHandler = () => {
   console.log(`server's listening on port ${applicationPortNumber}`);
 };
 
+expressApplicationInstance.use(xss());
+expressApplicationInstance.use(helmet());
+expressApplicationInstance.use(cors());
+expressApplicationInstance.use(bodyParser.urlencoded({ extended: false }));
+expressApplicationInstance.use(bodyParser.json());
+
 expressApplicationInstance.get("/", (req: Request, res: Response) =>
   res.send("connected")
 );
 
-expressApplicationInstance.use(cors);
-expressApplicationInstance.use(bodyParser.json());
-expressApplicationInstance.use(bodyParser.urlencoded({ extended: true }));
-expressApplicationInstance.use("/api", userRouter);
+expressApplicationInstance.use(
+  "/api",
+  userRouter,
+  exerciseRouter,
+  exerciseLogRouter
+);
+
+expressApplicationInstance.use(routeNotFoundMiddleware);
+expressApplicationInstance.use(errorHandlerMiddleware);
 
 const startExpressApplicationServer = async (
   portNumber: number | string,
