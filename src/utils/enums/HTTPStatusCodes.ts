@@ -1,0 +1,8 @@
+enum HTTPStatusCodes {
+  INTERNAL_SERVER_ERROR = 500,
+  BAD_REQUEST_ERROR = 400,
+  FORBIDDEN_ERROR = 403,
+  NOT_FOUND_ERROR = 404,
+}
+
+export default HTTPStatusCodes;
